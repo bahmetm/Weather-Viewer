@@ -1,8 +1,8 @@
 package com.bahmet.weatherviewer.model;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -18,13 +18,13 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user")
-    private Set<Session> sessions = new HashSet<>();
+    private List<Session> sessions = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "users_locations",
             joinColumns = @JoinColumn(name = "user"),
             inverseJoinColumns = @JoinColumn(name = "location"))
-    private Set<Location> locations = new HashSet<>();
+    private List<Location> locations = new ArrayList<>();
 
     public User() {
     }
@@ -53,11 +53,19 @@ public class User {
         this.password = password;
     }
 
-    public Set<Location> getLocations() {
+    public List<Session> getSessions() {
+        return sessions;
+    }
+
+    public void setSessions(List<Session> sessions) {
+        this.sessions = sessions;
+    }
+
+    public List<Location> getLocations() {
         return locations;
     }
 
-    public void setLocations(Set<Location> locations) {
+    public void setLocations(List<Location> locations) {
         this.locations = locations;
     }
 }
