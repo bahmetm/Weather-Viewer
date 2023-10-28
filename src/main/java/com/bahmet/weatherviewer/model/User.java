@@ -17,6 +17,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @OneToMany(mappedBy = "user")
+    private Set<Session> sessions = new HashSet<>();
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "users_locations",
             joinColumns = @JoinColumn(name = "user"),
@@ -24,11 +27,6 @@ public class User {
     private Set<Location> locations = new HashSet<>();
 
     public User() {
-    }
-
-    public User(String username, String password, Set<Location> locations) {
-        this.username = username;
-        this.password = password;
     }
 
     public int getId() {
