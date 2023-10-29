@@ -1,20 +1,60 @@
 package com.bahmet.weatherviewer.servlet.authentication;
 
+import com.bahmet.weatherviewer.dao.SessionDAO;
+import com.bahmet.weatherviewer.dao.UserDAO;
+import com.bahmet.weatherviewer.exception.UserNotFoundException;
+import com.bahmet.weatherviewer.model.Session;
+import com.bahmet.weatherviewer.model.User;
 import com.bahmet.weatherviewer.servlet.BaseServlet;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
+@WebServlet("/sign-in")
 public class SignInServlet extends BaseServlet {
+    private final UserDAO userDAO = new UserDAO();
+    private final SessionDAO sessionDAO = new SessionDAO();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doGet(req, resp);
+        templateEngine.process("log_in", webContext, resp.getWriter());
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
+        String username = req.getParameter("username");
+        String password = req.getParameter("password");
+
+        if (username == null || username.isEmpty()) {
+            throw new InvalidParameterException("Username cannot be empty.");
+        }
+
+        if (password == null || password.isEmpty()) {
+            throw new InvalidParameterException("Password cannot be empty.");
+        }
+
+        User user = userDAO.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found."));
+
+        String actualPassword = user.getPassword();
+
+        if (!BCrypt.checkpw(password, actualPassword)) {
+            throw new UserNotFoundException("Wrong password.");
+        }
+
+        Session session = new Session(UUID.randomUUID(), user, LocalDateTime.now().plusDays(7));
+        sessionDAO.save(session);
+
+        Cookie cookie = new Cookie("session_id", session.getId().toString());
+        resp.addCookie(cookie);
+
+        resp.sendRedirect("/");
     }
 }
