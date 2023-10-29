@@ -14,14 +14,20 @@ public class Session {
     private UUID id;
 
     @ManyToOne
-    @JoinColumn(name = "user", nullable = false)
+    @JoinColumn(name = "\"user\"", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private User user;
 
-    @Column(nullable = false)
+    @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
     public Session() {
+    }
+
+    public Session(UUID uuid, User user, LocalDateTime localDateTime) {
+        this.id = uuid;
+        this.user = user;
+        this.expiresAt = localDateTime;
     }
 
     public UUID getId() {

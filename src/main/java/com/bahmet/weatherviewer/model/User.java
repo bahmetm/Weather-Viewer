@@ -29,6 +29,11 @@ public class User {
     public User() {
     }
 
+    public User(String username, String hashedPassword) {
+        this.username = username;
+        this.password = hashedPassword;
+    }
+
     public int getId() {
         return id;
     }
