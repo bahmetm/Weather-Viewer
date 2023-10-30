@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "locations")
+@Table(name = "locations", indexes = {
+        @Index(name = "idx_lat_long", columnList = "latitude, longitude", unique = true)
+})
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
