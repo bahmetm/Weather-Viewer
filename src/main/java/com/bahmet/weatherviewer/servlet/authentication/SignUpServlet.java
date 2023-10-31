@@ -3,7 +3,9 @@ package com.bahmet.weatherviewer.servlet.authentication;
 import com.bahmet.weatherviewer.dao.SessionDAO;
 import com.bahmet.weatherviewer.dao.UserDAO;
 import com.bahmet.weatherviewer.model.User;
+import com.bahmet.weatherviewer.service.AuthService;
 import com.bahmet.weatherviewer.servlet.BaseServlet;
+import com.bahmet.weatherviewer.util.ValidatorUtil;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.ServletException;
@@ -18,6 +20,8 @@ public class SignUpServlet extends BaseServlet {
     private final UserDAO userDAO = new UserDAO();
     private final SessionDAO sessionDAO = new SessionDAO();
 
+    private final AuthService authService = new AuthService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         templateEngine.process("sign_up", webContext, resp.getWriter());
@@ -28,18 +32,9 @@ public class SignUpServlet extends BaseServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
 
-        if (username == null || username.isEmpty()) {
-            throw new InvalidParameterException("Username cannot be empty.");
-        }
+        ValidatorUtil.validateAuthParameters(username, password);
 
-        if (password == null || password.isEmpty()) {
-            throw new InvalidParameterException("Password cannot be empty.");
-        }
-
-        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
-
-        User user = new User(username, hashedPassword);
-        userDAO.save(user);
+        authService.signUp(username, password);
 
         resp.sendRedirect("/sign-in");
     }

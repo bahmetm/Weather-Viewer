@@ -5,7 +5,9 @@ import com.bahmet.weatherviewer.dao.UserDAO;
 import com.bahmet.weatherviewer.exception.UserNotFoundException;
 import com.bahmet.weatherviewer.model.Session;
 import com.bahmet.weatherviewer.model.User;
+import com.bahmet.weatherviewer.service.AuthService;
 import com.bahmet.weatherviewer.servlet.BaseServlet;
+import com.bahmet.weatherviewer.util.ValidatorUtil;
 import org.mindrot.jbcrypt.BCrypt;
 
 import javax.servlet.ServletException;
@@ -23,6 +25,8 @@ public class SignInServlet extends BaseServlet {
     private final UserDAO userDAO = new UserDAO();
     private final SessionDAO sessionDAO = new SessionDAO();
 
+    private final AuthService authService = new AuthService();
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         templateEngine.process("log_in", webContext, resp.getWriter());
@@ -33,21 +37,9 @@ public class SignInServlet extends BaseServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
 
-        if (username == null || username.isEmpty()) {
-            throw new InvalidParameterException("Username cannot be empty.");
-        }
+        ValidatorUtil.validateAuthParameters(username, password);
 
-        if (password == null || password.isEmpty()) {
-            throw new InvalidParameterException("Password cannot be empty.");
-        }
-
-        User user = userDAO.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found."));
-
-        String actualPassword = user.getPassword();
-
-        if (!BCrypt.checkpw(password, actualPassword)) {
-            throw new UserNotFoundException("Wrong password.");
-        }
+        User user = authService.signIn(username, password);
 
         Session session = new Session(UUID.randomUUID(), user, LocalDateTime.now().plusDays(7));
         sessionDAO.save(session);
