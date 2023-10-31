@@ -7,12 +7,15 @@ import org.thymeleaf.context.WebContext;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Optional;
 
 public class BaseServlet extends HttpServlet {
     protected ITemplateEngine templateEngine;
@@ -38,7 +41,17 @@ public class BaseServlet extends HttpServlet {
         }
     }
 
-    protected static boolean isSessionExpired(Session session) {
+    public static Optional<Cookie> findCookieByName(Cookie[] cookies, String name) {
+        if (cookies == null) {
+            return Optional.empty();
+        }
+
+        return Arrays.stream(cookies)
+                .filter(cookie -> cookie.getName().equals(name))
+                .findFirst();
+    }
+
+    public static boolean isSessionExpired(Session session) {
         LocalDateTime expiresAt = session.getExpiresAt();
         LocalDateTime now = LocalDateTime.now();
 
