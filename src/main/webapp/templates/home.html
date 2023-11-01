@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link href="/css/style.css" rel="stylesheet">
+
+    <title>Weather</title>
+</head>
+<body>
+<header th:replace="components/header :: header(${username}, null)"></header>
+<div class="container-fluid px-5 mt-3">
+    <h2 class="fw-bold">Saved places:</h2>
+</div>
+
+<div class="container-fluid p-5 pt-1">
+    <div class="container-fluid d-flex flex-row overflow-auto pb-3 justify-content-start"
+         style="scroll-snap-type: both mandatory;">
+        <div class="container border border-1 p-3 pb-0 me-3 ms-0" style="width: 450px; border-radius: 15px; scroll-snap-align: start;"
+             th:each="item: ${locationWeatherMap}">
+            <div class="row">
+                <div class="col d-flex align-items-center">
+                    <h2 class="fw-bold m-0 display-6" style="white-space: nowrap;" th:text="${item.key.getName()}"></h2>
+                </div>
+                <div class="col d-flex justify-content-end">
+                    <form action="/home" method="post">
+                        <input id="location_id" name="location_id" th:value="${item.key.getId()}" type="hidden">
+                        <button class="btn" type="submit">
+                            <i class="bi bi-x-lg fs-3"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="row border-bottom">
+                <div class="col">
+                    <img th:src="@{'/img/weather-conditions/' + ${item.value.weatherCondition} + '-' + ${item.value.timeOfDay} + '.svg'}"
+                         width="200">
+                </div>
+                <div class="col d-flex flex-column justify-content-center">
+                    <div class="row">
+                        <h3 class="display-3 fw-bold"
+                            th:text="${#numbers.formatDecimal(item.value.getTemperature(), 0, 0)} + '°C'"></h3>
+                    </div>
+                    <div class="row">
+                        <h4 class="text-muted"
+                            th:text="'Feels like: ' + ${#numbers.formatDecimal(item.value.getFeelsLike(), 0, 0)} + '°C'"></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="row border-bottom">
+                <div class="col px-0 d-flex align-items-center">
+                    <p class="my-1">
+                        <img src="/img/thermometer-colder.svg" width="50">
+                        Min Temp: <span
+                            th:text="${#numbers.formatDecimal(item.value.getTemperatureMinimum(), 0, 0)}"></span>°C
+                    </p>
+                </div>
+                <div class="col px-0 d-flex align-items-center">
+                    <p class="my-1">
+                        <img src="/img/thermometer-warmer.svg" width="50">
+                        Max Temp: <span
+                            th:text="${#numbers.formatDecimal(item.value.getTemperatureMaximum(), 0, 0)}"></span>°C
+                    </p>
+                </div>
+            </div>
+            <div class="row border-bottom">
+                <div class="col px-0 d-flex align-items-center">
+                    <p class="my-1">
+                        <img src="/img/cloudy.svg" width="50">
+                        Clouds: <span th:text="${item.value.cloudiness}"></span>%
+                    </p>
+                </div>
+                <div class="col px-0 d-flex align-items-center">
+                    <p class="my-1">
+                        <img src="/img/barometer.svg" width="50">
+                        Pressure: <span th:text="${item.value.pressure}"></span> hPa
+                    </p>
+                </div>
+            </div>
+            <div class="row border-bottom">
+                <div class="col px-0 d-flex align-items-center">
+                    <p class="my-1">
+                        <img src="/img/wind.svg" width="50">
+                        Wind: <span th:text="${item.value.windSpeed}"></span> km/h
+                    </p>
+                </div>
+                <div class="col px-0 d-flex align-items-center">
+                    <p class="my-1">
+                        <img src="/img/raindrop.svg" width="50">
+                        Humidity: <span th:text="${item.value.humidity}"></span>%
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col px-0 d-flex align-items-center">
+                    <p class="my-1">
+                        <img src="/img/sunrise.svg" width="50">
+                        Sunrise: <span th:text="${#temporals.format(item.value.getSunrise(), 'HH:mm')}"></span>
+                    </p>
+                </div>
+                <div class="col px-0 d-flex align-items-center">
+                    <p class="my-1">
+                        <img src="/img/sunset.svg" width="50">
+                        Sunset: <span th:text="${#temporals.format(item.value.getSunset(), 'HH:mm')}"></span>
+                    </p>
+                </div>
+            </div>
+            <div class="row" style="margin-left: -16px; margin-right: -16px;">
+                <div class="col bg-light border-top d-flex align-items-center"
+                     style="height: 30px; width: 450px; border-radius: 0px 0px 15px 15px;">
+                    <p class="mb-0 ms-1 text-secondary"
+                       th:text="'Last updated: ' + ${#temporals.format(item.value.getDate(), 'HH:mm:ss')}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script crossorigin="anonymous"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

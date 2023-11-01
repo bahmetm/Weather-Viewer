@@ -1,0 +1,37 @@
+<header class="p-3" th:fragment="header(usernaname, search_query)">
+    <div class="container-fluid">
+        <div class="row justify-content-between align-items-center">
+            <div class="col d-flex">
+                <a class="text-decoration-none text-dark no-wrap" href="/home"><h1 class="fw-bold text-nowrap">Weather
+                    tracker</h1></a>
+            </div>
+            <div class="col d-flex" th:classappend="${username}? '':'d-none'">
+                <form class="row w-100 d-flex justify-content-center" method="get" th:action="search">
+                    <div class="d-flex justify-content-center">
+                        <input class="form-control bg-light border-0 rounded-pill"
+                               id="search" name="query" placeholder="Enter the location name"
+                               required
+                               style="min-width: 200px; max-width: 300px;" th:value="${search_query}?:''" type="text">
+                        <button class="btn btn-primary ms-2 rounded-circle" style="padding: 8px 12px;" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="col d-flex justify-content-end" th:classappend="${username}? 'd-none' : ''">
+                <a class="btn btn-outline-primary px-4 rounded-pill fw-bold" href="sign-in" role="button"
+                   th:href="@{/sign-in}">Sign in</a>
+                <a class="btn btn-primary px-4 ms-2 rounded-pill fw-bold" href="sign-up" role="button"
+                   th:href="@{/sign-up}">Sign up</a>
+            </div>
+            <div class="col d-flex justify-content-end align-items-center"
+                 th:classappend="!(${username})? 'd-none' : ''">
+                <span th:text="${username}">username</span>
+                <form method="post" th:action="@{/sign-out}">
+                    <button class="btn btn-outline-primary px-4 rounded-pill fw-bold ms-4" type="submit">Sign out
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>
