@@ -10,7 +10,7 @@ public class PersistenceUtil {
         try {
             ENTITY_MANAGER_FACTORY = Persistence.createEntityManagerFactory("weatherPersistenceUnit");
         } catch (Throwable e) {
-            throw new ExceptionInInitializerError(e);
+            throw new ExceptionInInitializerError("Failed to initialize Database.");
         }
     }
 
