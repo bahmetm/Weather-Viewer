@@ -15,7 +15,7 @@ public class ValidatorUtil {
         }
     }
 
-    public static boolean validatePassword(String hashedPassword, String password) {
+    public static boolean validatePassword(String password, String hashedPassword) {
         return BCrypt.checkpw(password, hashedPassword);
     }
 }
