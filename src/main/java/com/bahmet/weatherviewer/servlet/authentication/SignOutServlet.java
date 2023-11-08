@@ -7,18 +7,24 @@ import com.bahmet.weatherviewer.exception.SessionNotFoundException;
 import com.bahmet.weatherviewer.model.Session;
 import com.bahmet.weatherviewer.servlet.BaseServlet;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.UUID;
 
 @WebServlet("/sign-out")
 public class SignOutServlet extends BaseServlet {
-    private final SessionDAO sessionDAO = new SessionDAO();
+    private SessionDAO sessionDAO;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        sessionDAO = (SessionDAO) config.getServletContext().getAttribute("sessionDAO");
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -41,6 +47,6 @@ public class SignOutServlet extends BaseServlet {
         newCookie.setMaxAge(0);
         resp.addCookie(newCookie);
 
-        resp.sendRedirect("/");
+        resp.sendRedirect("/sign-in");
     }
 }

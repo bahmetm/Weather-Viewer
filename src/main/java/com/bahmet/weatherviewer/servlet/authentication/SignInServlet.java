@@ -2,34 +2,38 @@ package com.bahmet.weatherviewer.servlet.authentication;
 
 import com.bahmet.weatherviewer.dao.SessionDAO;
 import com.bahmet.weatherviewer.dao.UserDAO;
-import com.bahmet.weatherviewer.exception.UserNotFoundException;
 import com.bahmet.weatherviewer.model.Session;
 import com.bahmet.weatherviewer.model.User;
 import com.bahmet.weatherviewer.service.AuthService;
 import com.bahmet.weatherviewer.servlet.BaseServlet;
 import com.bahmet.weatherviewer.util.ValidatorUtil;
-import org.mindrot.jbcrypt.BCrypt;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @WebServlet("/sign-in")
 public class SignInServlet extends BaseServlet {
-    private final UserDAO userDAO = new UserDAO();
-    private final SessionDAO sessionDAO = new SessionDAO();
+    private SessionDAO sessionDAO;
 
-    private final AuthService authService = new AuthService();
+    private AuthService authService;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        sessionDAO = (SessionDAO) config.getServletContext().getAttribute("sessionDAO");
+        authService = (AuthService) config.getServletContext().getAttribute("authService");
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        templateEngine.process("log_in", webContext, resp.getWriter());
+        templateEngine.process("sign_in", webContext, resp.getWriter());
     }
 
     @Override
@@ -47,6 +51,6 @@ public class SignInServlet extends BaseServlet {
         Cookie cookie = new Cookie("session_id", session.getId().toString());
         resp.addCookie(cookie);
 
-        resp.sendRedirect("/");
+        resp.sendRedirect("/home");
     }
 }
