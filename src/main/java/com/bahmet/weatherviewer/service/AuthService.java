@@ -1,5 +1,6 @@
 package com.bahmet.weatherviewer.service;
 
+import com.bahmet.weatherviewer.dao.SessionDAO;
 import com.bahmet.weatherviewer.dao.UserDAO;
 import com.bahmet.weatherviewer.exception.PasswordNotMatchException;
 import com.bahmet.weatherviewer.exception.UserExistsException;
@@ -9,7 +10,13 @@ import com.bahmet.weatherviewer.util.ValidatorUtil;
 import org.mindrot.jbcrypt.BCrypt;
 
 public class AuthService {
-    private final UserDAO userDAO = new UserDAO();
+    private final UserDAO userDAO;
+    private final SessionDAO sessionDAO;
+
+    public AuthService(UserDAO userDAO, SessionDAO sessionDAO) {
+        this.userDAO = userDAO;
+        this.sessionDAO = sessionDAO;
+    }
 
     public void signUp(String username, String password) {
         userDAO.findByUsername(username).ifPresent(user -> {
